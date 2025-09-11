@@ -1,0 +1,25 @@
+`define SF_DEBUG 1
+
+`define sflog(msg, cond, tag) \
+    `log(self.class.name $ "::" $ GetFuncName() $ "(): " $ `msg, \
+    `cond, \
+    `if(`tag) name("StatsFixer-" $ string(`tag)) `else 'StatsFixer' `endif)
+
+`define sfslog(msg, cond, tag) \
+    `log(default.class.name $ "::" $ GetFuncName() $ "(): " $ `msg, \
+    `cond, \
+    `if(`tag) name("StatsFixer-" $ string(`tag)) `else 'StatsFixer' `endif)
+
+`define sfwarn(msg, cond) `sflog(`msg, `cond, 'WARNING')
+`define sferror(msg, cond) `sflog(`msg, `cond, 'ERROR')
+
+`define sfswarn(msg, cond) `sfslog(`msg, `cond, 'WARNING')
+`define sfserror(msg, cond) `sfslog(`msg, `cond, 'ERROR')
+
+`if(`isdefined(SF_DEBUG))
+    `define sfdebug(msg, cond) `sflog(`msg, `cond, 'DEBUG')
+    `define sfsdebug(msg, cond) `sfslog(`msg, `cond, 'DEBUG')
+`else
+    `define sfdebug(msg, cond, tag)
+    `define sfsdebug(msg, cond, tag)
+`endif
