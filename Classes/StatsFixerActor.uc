@@ -131,9 +131,33 @@ static function string StatInfoToString(StatInfo SI)
     return "(StatID=" $ SI.StatID $ ", StatType=" $ SI.StatType $ ", StatName=" $ SI.StatName $ ")";
 }
 
-`define STATID__ {\`}STATID_
-`define DefStatID(Name) `STATID__`_Name
-`define DefStat(Name, Type) StatID=`DefStatID(`Name), StatName=`Name, StatType=`Type
+// Helpers required due to lack of nested macros in UnrealScript.
+const STATID_HumanKills = `STATID_HumanKills;
+const STATID_MGKills = `STATID_MGKills;
+const STATID_MeleeKills = `STATID_MeleeKills;
+const STATID_SniperKills = `STATID_SniperKills;
+const STATID_TEWins = `STATID_TEWins;
+const STATID_SUWins = `STATID_SUWins;
+const STATID_SKWins = `STATID_SKWins;
+const STATID_FFWins = `STATID_FFWins;
+const STATID_BayonetKills = `STATID_BayonetKills;
+const STATID_TimeCrouched = `STATID_TimeCrouched;
+const STATID_TimeProned = `STATID_TimeProned;
+const STATID_Mantles = `STATID_Mantles;
+const STATID_GunshipKills = `STATID_GunshipKills;
+const STATID_HeloInsertions = `STATID_HeloInsertions;
+const STATID_SpawnsInHelos = `STATID_SpawnsInHelos;
+const STATID_CobraTurretKills = `STATID_CobraTurretKills;
+const STATID_TimeInCamo = `STATID_TimeInCamo;
+const STATID_DoorGunnerKills = `STATID_DoorGunnerKills;
+const STATID_SprintDist = `STATID_SprintDist;
+const STATID_CrouchSprintDist = `STATID_CrouchSprintDist;
+const STATID_TimeOnLadders = `STATID_TimeOnLadders;
+const STATID_BushrangerPilotKills = `STATID_BushrangerPilotKills;
+const STATID_BushrangerGunnerKills = `STATID_BushrangerGunnerKills;
+const STATID_GarandReloads = `STATID_GarandReloads;
+
+`define DefStat(Name, Type) StatID=STATID_`Name, StatName=`Name, StatType=`Type
 
 DefaultProperties
 {
