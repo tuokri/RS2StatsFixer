@@ -23,9 +23,6 @@
 class StatsFixerActor extends Actor
     placeable;
 
-`define	STATID_TimeCrouched			1076
-`define	STATID_HumanKills			69
-
 enum EStatType
 {
     EST_Int,
