@@ -81,6 +81,9 @@ function FixStats(PlayerReplicationInfo Sender)
     local int IntStat;
     local float FloatStat;
     local ROPlayerController ROPC;
+    local int NumFixed;
+
+    NumFixed = 0;
 
     ROPC = ROPlayerController(Sender.Owner);
     if (ROPC != None)
@@ -89,22 +92,28 @@ function FixStats(PlayerReplicationInfo Sender)
 
         for (i = 0; i < StatsToFix.Length; ++i)
         {
+            `sflog("checking stat:" @ StatInfoToString(StatsToFix[i]));
+
             switch (StatsToFix[i].StatType)
             {
-                // `sflog("checking DefStat: " @ StatInfoToString(StatsToFix[i]));
-
                 case EST_Int:
                     IntStat = ROPC.StatsWrite.GetIntStat(StatsToFix[i].StatID);
+                    `sflog(" " $ StatsToFix[i].StatID @ "current value: " @ IntStat);
                     if (IntStat < 0)
                     {
+                        `sflog(" " $ StatsToFix[i].StatID @ "resetting to 0");
                         ROPC.StatsWrite.SetIntStat(StatsToFix[i].StatID, 0);
+                        ++NumFixed;
                     }
                     break;
                 case EST_Float:
                     FloatStat = ROPC.StatsWrite.GetFloatStat(StatsToFix[i].StatID);
+                    `sflog(" " $ StatsToFix[i].StatID @ "current value: " @ FloatStat);
                     if (FloatStat < 0.0)
                     {
+                        `sflog(" " $ StatsToFix[i].StatID @ "resetting to 0");
                         ROPC.StatsWrite.SetFloatStat(StatsToFix[i].StatID, 0.0);
+                        ++NumFixed;
                     }
                     break;
                 default:
@@ -112,6 +121,15 @@ function FixStats(PlayerReplicationInfo Sender)
                     break;
             }
         }
+    }
+
+    if (NumFixed > 0)
+    {
+        ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stats.");
+    }
+    else
+    {
+        ROPC.ClientMessage("StatsFixer: No stats needed fixing.");
     }
 }
 
@@ -170,8 +188,8 @@ DefaultProperties
     StatsToFix( 6)=(`DefStat(SKWins,                        EST_Int))
     StatsToFix( 7)=(`DefStat(FFWins,                        EST_Int))
     StatsToFix( 8)=(`DefStat(BayonetKills,                  EST_Int))
-    StatsToFix( 9)=(`DefStat(TimeCrouched,                  EST_Int))
-    StatsToFix(10)=(`DefStat(TimeProned,                    EST_Int))
+    StatsToFix( 9)=(`DefStat(TimeCrouched,                  EST_Float))
+    StatsToFix(10)=(`DefStat(TimeProned,                    EST_Float))
     StatsToFix(11)=(`DefStat(Mantles,                       EST_Int))
     StatsToFix(12)=(`DefStat(GunshipKills,                  EST_Int))
     StatsToFix(13)=(`DefStat(HeloInsertions,                EST_Int))
