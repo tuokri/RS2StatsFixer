@@ -122,12 +122,17 @@ function FixStats(PlayerReplicationInfo Sender)
 
     if (NumFixed > 0)
     {
+        ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
+            'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
+        ROPC.OnlineSub.StatsInterface.FlushOnlineStats('Game');
         ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stats.");
     }
     else
     {
         ROPC.ClientMessage("StatsFixer: No stats needed fixing.");
     }
+
+    ROPC.ClientMessage("StatsFixer: Please return to the main menu.");
 }
 
 event Destroyed()
