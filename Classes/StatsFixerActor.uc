@@ -45,10 +45,62 @@ event PostBeginPlay()
 {
     super.PostBeginPlay();
 
-    MessagingSpec = Spawn(class'StatsFixerMessagingSpectator', self);
-    MessagingSpec.SFOwner = self;
+    if (WorldInfo.NetMode == NM_DedicatedServer && Role == ROLE_Authority)
+    {
+        MessagingSpec = Spawn(class'StatsFixerMessagingSpectator', self);
+        MessagingSpec.SFOwner = self;
+    }
+    else
+    {
+        `sfdebug("not initializing messaging, NetMode="
+            @ WorldInfo.NetMode $ ", Role=" @ Role);
+    }
 
     `sflog(self @ "initialized");
+}
+
+function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
+{
+`if(`isdefined(SF_DEBUG))
+    local ROPlayerController ROPC;
+    local array<string> Args;
+    local int IntArg1;
+
+    ROPC = ROPlayerController(Sender.Owner);
+    if (ROPC == None)
+    {
+        `sferror("invalid Sender:" @ Sender);
+        return;
+    }
+
+    Args = SplitString(Msg, " ", True);
+    `sfdebug("Msg:" @ Msg);
+    if (Args.Length == 0)
+    {
+        return;
+    }
+
+    if (Args[0] == "SetStat")
+    {
+        IntArg1 = int(Args[1]);
+        `sfdebug("setting stat" @ IntArg1 @ "to" @ Args[2]);
+        if (Args[3] ~= "int")
+        {
+            ROPC.StatsWrite.SetIntStat(IntArg1, int(Args[2]));
+        }
+        else if (Args[3] ~= "float")
+        {
+            ROPC.StatsWrite.SetFloatStat(IntArg1, float(Args[2]));
+        }
+        else
+        {
+            `sferror("invalid type:" @ Args[3]);
+            return;
+        }
+    }
+`else
+    return;
+`endif
 }
 
 function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
@@ -70,6 +122,10 @@ function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
     {
         FixStats(Sender);
     }
+
+`if(`isdefined(SF_DEBUG))
+    HandleDebugCommand(Sender, Msg);
+`endif
 }
 
 function FixStats(PlayerReplicationInfo Sender)
@@ -181,30 +237,30 @@ const STATID_GarandReloads = `STATID_GarandReloads;
 
 DefaultProperties
 {
-    StatsToFix( 0)=(`DefStat(HumanKills,                    EST_Int))
-    StatsToFix( 1)=(`DefStat(MGKills,                       EST_Int))
-    StatsToFix( 2)=(`DefStat(MeleeKills,                    EST_Int))
-    StatsToFix( 3)=(`DefStat(SniperKills,                   EST_Int))
-    StatsToFix( 4)=(`DefStat(TEWins,                        EST_Int))
-    StatsToFix( 5)=(`DefStat(SUWins,                        EST_Int))
-    StatsToFix( 6)=(`DefStat(SKWins,                        EST_Int))
-    StatsToFix( 7)=(`DefStat(FFWins,                        EST_Int))
-    StatsToFix( 8)=(`DefStat(BayonetKills,                  EST_Int))
-    StatsToFix( 9)=(`DefStat(TimeCrouched,                  EST_Float))
-    StatsToFix(10)=(`DefStat(TimeProned,                    EST_Float))
-    StatsToFix(11)=(`DefStat(Mantles,                       EST_Int))
-    StatsToFix(12)=(`DefStat(GunshipKills,                  EST_Int))
-    StatsToFix(13)=(`DefStat(HeloInsertions,                EST_Int))
-    StatsToFix(14)=(`DefStat(SpawnsInHelos,                 EST_Int))
-    StatsToFix(15)=(`DefStat(CobraTurretKills,              EST_Int))
-    StatsToFix(16)=(`DefStat(TimeInCamo,                    EST_Float))
-    StatsToFix(17)=(`DefStat(DoorGunnerKills,               EST_Int))
-    StatsToFix(18)=(`DefStat(SprintDist,                    EST_Int))
-    StatsToFix(19)=(`DefStat(CrouchSprintDist,              EST_Int))
-    StatsToFix(20)=(`DefStat(TimeOnLadders,                 EST_Float))
-    StatsToFix(21)=(`DefStat(BushrangerPilotKills,          EST_Int))
-    StatsToFix(22)=(`DefStat(BushrangerGunnerKills,         EST_Int))
-    StatsToFix(23)=(`DefStat(GarandReloads,                 EST_Int))
+    StatsToFix.Add((`DefStat(HumanKills,                    EST_Int)))
+    StatsToFix.Add((`DefStat(MGKills,                       EST_Int)))
+    StatsToFix.Add((`DefStat(MeleeKills,                    EST_Int)))
+    StatsToFix.Add((`DefStat(SniperKills,                   EST_Int)))
+    StatsToFix.Add((`DefStat(TEWins,                        EST_Int)))
+    StatsToFix.Add((`DefStat(SUWins,                        EST_Int)))
+    StatsToFix.Add((`DefStat(SKWins,                        EST_Int)))
+    StatsToFix.Add((`DefStat(FFWins,                        EST_Int)))
+    StatsToFix.Add((`DefStat(BayonetKills,                  EST_Int)))
+    StatsToFix.Add((`DefStat(TimeCrouched,                  EST_Float)))
+    StatsToFix.Add((`DefStat(TimeProned,                    EST_Float)))
+    StatsToFix.Add((`DefStat(Mantles,                       EST_Int)))
+    StatsToFix.Add((`DefStat(GunshipKills,                  EST_Int)))
+    StatsToFix.Add((`DefStat(HeloInsertions,                EST_Int)))
+    StatsToFix.Add((`DefStat(SpawnsInHelos,                 EST_Int)))
+    StatsToFix.Add((`DefStat(CobraTurretKills,              EST_Int)))
+    StatsToFix.Add((`DefStat(TimeInCamo,                    EST_Float)))
+    StatsToFix.Add((`DefStat(DoorGunnerKills,               EST_Int)))
+    StatsToFix.Add((`DefStat(SprintDist,                    EST_Int)))
+    StatsToFix.Add((`DefStat(CrouchSprintDist,              EST_Int)))
+    StatsToFix.Add((`DefStat(TimeOnLadders,                 EST_Float)))
+    StatsToFix.Add((`DefStat(BushrangerPilotKills,          EST_Int)))
+    StatsToFix.Add((`DefStat(BushrangerGunnerKills,         EST_Int)))
+    StatsToFix.Add((`DefStat(GarandReloads,                 EST_Int)))
 
     Begin Object Class=SpriteComponent Name=Sprite
         Sprite=Texture2D'EditorResources.VolumePath'
