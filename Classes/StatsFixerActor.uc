@@ -44,7 +44,7 @@ var StatsFixerMessagingSpectator MessagingSpec;
 function bool ShouldEnableMessaging()
 {
 `if(`isdefined(SF_DEBUG))
-    return WorldInfo.IsPlayInEditor();
+    return True;
 `else
     return WorldInfo.NetMode == NM_DedicatedServer && Role == ROLE_Authority;
 `endif
