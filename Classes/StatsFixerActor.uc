@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+// Level actor that fixes bugged stats, such as negative ones.
+// Place this on a level and run the level on a dedicated server.
 class StatsFixerActor extends Actor
     placeable;
 
@@ -48,6 +50,9 @@ function bool ShouldEnableMessaging()
 `else
     return WorldInfo.NetMode == NM_DedicatedServer && Role == ROLE_Authority;
 `endif
+
+    // TODO: It appears this also works in standalone? Or maybe not?
+    // return True;
 }
 
 event PostBeginPlay()
@@ -96,7 +101,7 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
 
     // SetStat 1076 -4234.045 float
     // SetStat 1066 -6969 int
-    if (Args[0] == "SetStat")
+    if (Args[0] ~= "SetStat")
     {
         IntArg1 = int(Args[1]);
         `sfdebug("setting stat" @ IntArg1 @ "to" @ Args[2]);
@@ -125,7 +130,7 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
     }
     // GetStat 1076 float
     // GetStat 1066 int
-    else if (Args[0] == "GetStat")
+    else if (Args[0] ~= "GetStat")
     {
         IntArg1 = int(Args[1]);
         `sfdebug("getting stat" @ IntArg1);
@@ -158,10 +163,10 @@ function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
 {
     `sfdebug(
         self
-        @ "Sender=" @ Sender
-        @ "Msg=" @ Msg
-        @ "Type=" @ Type
-        @ "Role=" @ Role
+        @ "Sender=" $ Sender
+        @ "Msg=" $ Msg
+        @ "Type=" $ Type
+        @ "Role=" $ Role
     );
 
     if (Role != ROLE_Authority)
@@ -169,9 +174,10 @@ function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
         return;
     }
 
-    if (Msg == "FixMe")
+    if (Msg ~= "FixMe" || Msg ~= "FixStats")
     {
         FixStats(Sender);
+        return;
     }
 
 `if(`isdefined(SF_DEBUG))

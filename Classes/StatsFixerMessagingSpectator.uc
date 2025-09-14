@@ -20,12 +20,32 @@
  * SOFTWARE.
  */
 
+// Intercept chat messages and forward them to our StatsFixerActor.
 class StatsFixerMessagingSpectator extends MessagingSpectator;
 
 var StatsFixerActor SFOwner;
 
+simulated event PostBeginPlay()
+{
+    super.PostBeginPlay();
+
+    `sflog(self @ "initialized");
+}
+
+reliable client event TeamMessage(
+    PlayerReplicationInfo PRI, coerce string S, name Type, optional float MsgLifeTime)
+{
+    ReceiveMessage(PRI, S, Type);
+}
+
 function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
 {
+    `sfdebug("Sender:" @ Sender.PlayerName
+        $ ", Msg:" @ Msg
+        $ ", Type:" @ Type
+        $ ", SFOwner:" @ SFOwner
+    );
+
     if (SFOwner != None)
     {
         SFOwner.ReceiveMessage(Sender, Msg, Type);

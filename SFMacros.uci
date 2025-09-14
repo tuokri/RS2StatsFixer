@@ -1,4 +1,4 @@
-`define SF_DEBUG 1
+`define SF_DEBUG 0
 
 `define sflog(msg, cond, tag) \
     `log(self.class.name $ "::" $ GetFuncName() $ "(): " $ `msg, \
