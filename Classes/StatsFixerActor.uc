@@ -65,6 +65,11 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
     local ROPlayerController ROPC;
     local array<string> Args;
     local int IntArg1;
+    local int IntVal;
+    local float FloatVal;
+    local bool bFlush;
+
+    bFlush = False;
 
     ROPC = ROPlayerController(Sender.Owner);
     if (ROPC == None)
@@ -80,6 +85,8 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
         return;
     }
 
+    // SetStat 1076 -4234.045 float
+    // SetStat 1066 -6969 int
     if (Args[0] == "SetStat")
     {
         IntArg1 = int(Args[1]);
@@ -87,16 +94,51 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
         if (Args[3] ~= "int")
         {
             ROPC.StatsWrite.SetIntStat(IntArg1, int(Args[2]));
+            bFlush = True;
         }
         else if (Args[3] ~= "float")
         {
             ROPC.StatsWrite.SetFloatStat(IntArg1, float(Args[2]));
+            bFlush = True;
         }
         else
         {
             `sferror("invalid type:" @ Args[3]);
             return;
         }
+
+        if (bFlush)
+        {
+            ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
+                'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
+            ROPC.OnlineSub.StatsInterface.FlushOnlineStats('Game');
+        }
+    }
+    // GetStat 1076 float
+    // GetStat 1066 int
+    else if (Args[0] == "GetStat")
+    {
+        IntArg1 = int(Args[1]);
+        `sfdebug("getting stat" @ IntArg1);
+        if (Args[2] ~= "int")
+        {
+            IntVal = ROPC.StatsWrite.GetIntStat(IntArg1);
+            ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ IntVal);
+        }
+        else if (Args[2] ~= "float")
+        {
+            FloatVal = ROPC.StatsWrite.GetFloatStat(IntArg1);
+            ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ FloatVal);
+        }
+        else
+        {
+            `sferror("invalid type:" @ Args[2]);
+            return;
+        }
+    }
+    else
+    {
+        `sfdebug("unknown debug command:" @ Args[0]);
     }
 `else
     return;
