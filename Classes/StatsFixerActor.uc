@@ -41,11 +41,20 @@ var array<StatInfo> StatsToFix;
 
 var StatsFixerMessagingSpectator MessagingSpec;
 
+function bool ShouldEnableMessaging()
+{
+`if(`isdefined(SF_DEBUG))
+    return WorldInfo.IsPlayInEditor();
+`else
+    return WorldInfo.NetMode == NM_DedicatedServer && Role == ROLE_Authority;
+`endif
+}
+
 event PostBeginPlay()
 {
     super.PostBeginPlay();
 
-    if (WorldInfo.NetMode == NM_DedicatedServer && Role == ROLE_Authority)
+    if (ShouldEnableMessaging())
     {
         MessagingSpec = Spawn(class'StatsFixerMessagingSpectator', self);
         MessagingSpec.SFOwner = self;
