@@ -138,11 +138,13 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
         {
             IntVal = ROPC.StatsWrite.GetIntStat(IntArg1);
             ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ IntVal);
+            `sfinfo("stat: " @ IntArg1 $ "=" $ IntVal);
         }
         else if (Args[2] ~= "float")
         {
             FloatVal = ROPC.StatsWrite.GetFloatStat(IntArg1);
             ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ FloatVal);
+            `sfinfo("stat: " @ IntArg1 $ "=" $ FloatVal);
         }
         else
         {
