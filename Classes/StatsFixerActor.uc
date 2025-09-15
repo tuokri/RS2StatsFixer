@@ -213,6 +213,7 @@ function FixStats(PlayerReplicationInfo Sender)
                     {
                         `sflog(" " $ StatsToFix[i].StatID @ "resetting to 0");
                         ROPC.StatsWrite.SetIntStat(StatsToFix[i].StatID, 0);
+                        ROPC.ClientMessage("StatsFixer: Fixed stat:" @ StatsToFix[i].StatName);
                         ++NumFixed;
                     }
                     break;
@@ -223,6 +224,7 @@ function FixStats(PlayerReplicationInfo Sender)
                     {
                         `sflog(" " $ StatsToFix[i].StatID @ "resetting to 0");
                         ROPC.StatsWrite.SetFloatStat(StatsToFix[i].StatID, 0.0);
+                        ROPC.ClientMessage("StatsFixer: Fixed stat:" @ StatsToFix[i].StatName);
                         ++NumFixed;
                     }
                     break;
