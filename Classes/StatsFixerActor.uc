@@ -55,14 +55,21 @@ function bool ShouldEnableMessaging()
     // return True;
 }
 
+function InitMessaging()
+{
+    MessagingSpec = Spawn(class'StatsFixerMessagingSpectator', self);
+    MessagingSpec.SFOwner = self;
+}
+
 event PostBeginPlay()
 {
     super.PostBeginPlay();
 
     if (ShouldEnableMessaging())
     {
-        MessagingSpec = Spawn(class'StatsFixerMessagingSpectator', self);
-        MessagingSpec.SFOwner = self;
+        // Apparently WebAdmin can destroy our messaging spectator as part of
+        // its cleanup, so delay our initialization a bit.
+        SetTimer(1.5, False, NameOf(InitMessaging));
     }
     else
     {
@@ -125,7 +132,7 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
         {
             ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
                 'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
-            ROPC.OnlineSub.StatsInterface.FlushOnlineStats('Game');
+            FlushStats();
         }
     }
     // GetStat 1076 float
@@ -187,6 +194,14 @@ function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
 `endif
 }
 
+function FlushStats()
+{
+    local ROGameInfo ROGI;
+
+    ROGI = ROGameInfo(WorldInfo.Game);
+    ROGI.OnlineSub.StatsInterface.FlushOnlineStats('Game');
+}
+
 function FixStats(PlayerReplicationInfo Sender)
 {
     local int i;
@@ -194,7 +209,6 @@ function FixStats(PlayerReplicationInfo Sender)
     local float FloatStat;
     local ROPlayerController ROPC;
     local int NumFixed;
-    local ROGameInfo ROGI;
 
     NumFixed = 0;
 
@@ -242,8 +256,7 @@ function FixStats(PlayerReplicationInfo Sender)
     {
         ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
             'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
-        ROGI = ROGameInfo(WorldInfo.Game);
-        ROGI.OnlineSub.StatsInterface.FlushOnlineStats('Game');
+        FlushStats();
         ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stats.");
     }
     else
@@ -271,6 +284,7 @@ static function string StatInfoToString(StatInfo SI)
 }
 
 // Helpers required due to lack of nested macros in UnrealScript.
+// TODO: extend this as needed, if reported by users.
 const STATID_HumanKills = `STATID_HumanKills;
 const STATID_MGKills = `STATID_MGKills;
 const STATID_MeleeKills = `STATID_MeleeKills;
