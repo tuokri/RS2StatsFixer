@@ -138,13 +138,13 @@ function HandleDebugCommand(PlayerReplicationInfo Sender, string Msg)
         {
             IntVal = ROPC.StatsWrite.GetIntStat(IntArg1);
             ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ IntVal);
-            `sfinfo("stat: " @ IntArg1 $ "=" $ IntVal);
+            `sflog("stat: " @ IntArg1 $ "=" $ IntVal);
         }
         else if (Args[2] ~= "float")
         {
             FloatVal = ROPC.StatsWrite.GetFloatStat(IntArg1);
             ROPC.ClientMessage("Stat" @ IntArg1 @ "=" @ FloatVal);
-            `sfinfo("stat: " @ IntArg1 $ "=" $ FloatVal);
+            `sflog("stat: " @ IntArg1 $ "=" $ FloatVal);
         }
         else
         {
@@ -194,6 +194,7 @@ function FixStats(PlayerReplicationInfo Sender)
     local float FloatStat;
     local ROPlayerController ROPC;
     local int NumFixed;
+    local ROGameInfo ROGI;
 
     NumFixed = 0;
 
@@ -241,7 +242,8 @@ function FixStats(PlayerReplicationInfo Sender)
     {
         ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
             'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
-        ROPC.OnlineSub.StatsInterface.FlushOnlineStats('Game');
+        ROGI = ROGameInfo(WorldInfo.Game);
+        ROGI.OnlineSub.StatsInterface.FlushOnlineStats('Game');
         ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stats.");
     }
     else
