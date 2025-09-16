@@ -52,6 +52,13 @@ function ReceiveMessage(PlayerReplicationInfo Sender, string Msg, name Type)
     }
 }
 
+event Destroyed()
+{
+    super.Destroyed();
+
+    `sfdebug(self @ "destroyed");
+}
+
 function InitPlayerReplicationInfo()
 {
     super.InitPlayerReplicationInfo();
