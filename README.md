@@ -6,7 +6,7 @@ If some of your stats are bugged (very large negative values), this mod can fix 
 
 ![Negative RS2 stats example.](./media/negative_stats_example.png)
 
-## Instruction
+## Instructions
 
 1. Install the mod from Steam Workshop (link below) on your dedicated server.
 2. Launch the `VNTE-StatsFixerLevel` map.
