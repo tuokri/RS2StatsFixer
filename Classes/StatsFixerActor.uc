@@ -257,7 +257,7 @@ function FixStats(PlayerReplicationInfo Sender)
         ROPC.OnlineSub.StatsInterface.WriteOnlineStats(
             'Game', ROPC.PlayerReplicationInfo.UniqueID, ROPC.StatsWrite);
         FlushStats();
-        ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stats.");
+        ROPC.ClientMessage("StatsFixer: Fixed" @ NumFixed @ "stat(s).");
     }
     else
     {
